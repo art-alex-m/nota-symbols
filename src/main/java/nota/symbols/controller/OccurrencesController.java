@@ -3,6 +3,7 @@ package nota.symbols.controller;
 import nota.symbols.dto.Entry;
 import nota.symbols.dto.Error;
 import nota.symbols.service.OccurrencesService;
+import nota.symbols.service.OccurrencesTaskExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -28,6 +29,12 @@ public class OccurrencesController {
     @ExceptionHandler(HttpMessageConversionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public List<Error> handleEmptyRequestException(HttpMessageConversionException ex) {
+        return List.of(new Error("text", ex.getLocalizedMessage()));
+    }
+
+    @ExceptionHandler(OccurrencesTaskExecutionException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public List<Error> handleEmptyRequestException(RuntimeException ex) {
         return List.of(new Error("text", ex.getLocalizedMessage()));
     }
 }

@@ -1,6 +1,7 @@
 package nota.symbols.controller;
 
 import nota.symbols.service.OccurrencesService;
+import nota.symbols.service.OccurrencesTaskExecutionException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +42,18 @@ class OccurrencesControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(is(not(emptyOrNullString()))));
         Mockito.verify(occurrencesService, Mockito.never()).compute(Mockito.anyString());
+    }
+
+    @Test
+    void whenOccurrenceException_thenServerErrorStatus() throws Exception {
+        String content = "aaaa";
+        Mockito.when(occurrencesService.compute(content)).thenThrow(
+                new OccurrencesTaskExecutionException("Some error"));
+
+        mockMvc.perform(post(uri).content(content).contentType(MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(status().is5xxServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(is(not(emptyOrNullString()))));
+        Mockito.verify(occurrencesService, Mockito.times(1)).compute(content);
     }
 }
