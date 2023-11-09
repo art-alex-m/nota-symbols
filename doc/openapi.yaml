@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  version: '0.0.1'
+  title: 'SymbolsApplication REST API'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /occurrence:
+    post:
+      description: Запрос на подсчет частоты вхождения символов
+      requestBody:
+        description: Исходный текст для анализа
+        required: true
+        content:
+          text/plain:
+            schema:
+              type:
+                - string
+              example: aaaabbdddccccccc
+      responses:
+        200:
+          description: Список найденных вхождений
+          content:
+            application/json:
+              schema:
+                type:
+                  - array
+                items:
+                  $ref: '#/components/schemas/Entry'
+        400:
+          description: Список ошибок валидации запроса
+          content:
+            application/json:
+              schema:
+                type:
+                  - array
+                items:
+                  $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Entry:
+      properties:
+        symbol:
+          description: Найденный символ
+          type:
+            - string
+          example: a
+        count:
+          description: Частота вхождения
+          type:
+            - integer
+          example: 101
+    Error:
+      properties:
+        param:
+          description: Отсылка ко входному параметру запроса
+          type:
+            - string
+          example: text
+        message:
+          description: Описание ошибки
+          type:
+            - string
+          example: Required request body is missing
